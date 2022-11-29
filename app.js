@@ -21,6 +21,10 @@ const fs = require('fs');
 // })
 
 
-fs.mkdir('./students',  (err) => { // создали новую директорию 'students'
-    console.log(err);
+// fs.mkdir('./students',  (err) => { // создали новую директорию 'students'
+//     console.log(err);
+// })
+
+fs.appendFile('./students/data.json', JSON.stringify({name:'Valera'}), (err) => {
+    console.log(err);  // в директорию 'students' добавили файл 'data.json' с данными {name:'Valera'}
 })
