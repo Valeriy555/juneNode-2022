@@ -1,7 +1,6 @@
 const express = require('express');
-const {fileServices} = require("./services");
-
-
+const {writer, reader} = require("./services/file.services");
+// const {fileServices} = require("./services");
 
 const app = express();
 
@@ -9,32 +8,11 @@ app.use(express.json());
 app.use(express.urlencoded({extended: true}))
 
 
-app.get('/users', (req, res) => {
-    console.log('USERS ENDPOINT');
-
-    res.json({user: 'Valera'})
-});
-
-app.get('/posts', (req, res) => {
-    console.log('POSTS ENDPOINT');
-
-    res.status(402).json('ITS OK');
-});
-
-app.get('/', (req, res) => {
-    res.json('WELCOME');
-});
-
-// app.get('/file',(req, res) =>{        // редко используется
-//     console.log('FILE ENDPOINT');
-//
-//     res.sendFile('./file.txt');
-// });
 
 app.get('/usersDb', async (req, res) => {
     console.log('UsersDb ENDPOINT');
 
-    const usersDb = await fileServices.reader();
+    const usersDb = await reader();
 
     res.json(usersDb)
 });
@@ -44,7 +22,7 @@ app.get('/usersDb/:userId', async (req, res) => { // вызываем юзеро
 
     const {userId} = req.params
 
-    const usersDb = await fileServices.reader();
+    const usersDb = await reader();
 
     const user = usersDb.find((u) => u.id === +userId); //ищем пользователя по id
 
@@ -67,7 +45,7 @@ app.post('/usersDb', async (req, res) => {
         return res.status(400).json(`Wrong name`)
     }
 
-    const usersDb = await fileServices.reader();
+    const usersDb = await reader();
 
     const newUser = {
         name: userInfo.name,
@@ -77,7 +55,7 @@ app.post('/usersDb', async (req, res) => {
 
     usersDb.push(newUser);
 
-    await fileServices.writer(usersDb);
+    await writer(usersDb);
 
     res.status(201).json(newUser)
 });
@@ -86,7 +64,7 @@ app.put('/usersDb/:userId', async (req, res) => {
     const newUserInfo = req.body;
     const {userId} = req.params;
 
-    const usersDb = await fileServices.reader();
+    const usersDb = await reader();
 
     const index = usersDb.findIndex((u) => u.id === +userId); //ищем пользователя по индексу
 
@@ -95,7 +73,7 @@ app.put('/usersDb/:userId', async (req, res) => {
     }
     usersDb[index] = {...usersDb[index], ...newUserInfo}
 
-    await fileServices.writer(usersDb);
+    await writer(usersDb);
 
     res.status(201).json(usersDb[index])
 });
@@ -103,7 +81,7 @@ app.put('/usersDb/:userId', async (req, res) => {
 app.delete('/usersDb/:userId', async (req, res) => {
     const {userId} = req.params;
 
-    const usersDb = await fileServices.reader();
+    const usersDb = await reader();
 
     const index = usersDb.findIndex((u) => u.id === +userId); //ищем пользователя по индексу
 
@@ -112,7 +90,7 @@ app.delete('/usersDb/:userId', async (req, res) => {
     }
     usersDb.splice(index, 1)
 
-    await fileServices.writer(usersDb);
+    await writer(usersDb);
 
     res.sendStatus(204);
 });
