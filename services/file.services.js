@@ -8,7 +8,6 @@ module.exports = {
         const buffer = await fs.readFile(pathToFile);
         return JSON.parse(buffer.toString());
 
-         // return await fs.readFile(pathToFile)
     },
 
      writer : async (usersDb) => {

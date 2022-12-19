@@ -1,7 +1,8 @@
 const express = require('express');
-const {fileServices} = require("./services");
+require('dotenv').config()
 
 const userRouter = require('./router/user.router')
+const configs = require('./config/config');
 
 const app = express();
 
@@ -10,9 +11,16 @@ app.use(express.urlencoded({extended: true}));
 
 app.use('/usersDb', userRouter)
 
+app.use((err, req, res, next) => {
 
-app.listen(5000, () => {
-    console.log('Server listen 5000');
+    res.status(err.status || 500).json({
+        message: err.message || 'Unknown error',
+        status: err.status || 500
+    });
+});
+
+app.listen(configs.PORT, () => {
+    console.log(`Server listen ${configs.PORT}`);
 });
 
 
