@@ -46,16 +46,17 @@ module.exports = {
     },
 
     updateUserById: async (req, res, next) => {
+
         try {
-            const {user, usersDb, body} = req;
+            const {user, users, body} = req;
 
-            const index = usersDb.findIndex((u) => u.id === user.id)
+            const index = users.findIndex((u) => u.id === user.id)
 
-            usersDb[index] = {...usersDb[index], ...body};
+            users[index] = {...users[index], ...body};
 
-            await fileServices.writer(usersDb);
+            await fileServices.writer(users);
 
-            res.status(201).json(usersDb[index]);
+            res.status(201).json(users[index]);
         } catch (e) {
             next(e);
         }
@@ -63,18 +64,14 @@ module.exports = {
 
     deleteUserById: async (req, res, next) => {
         try {
-            const {userId} = req.params;
+            const {user, users} = req;
 
-            const usersDb = await fileServices.reader();
+            const index = users.findIndex((u) => u.id === user.id); //ищем пользователя по индексу
 
-            const index = usersDb.findIndex((u) => u.id === +userId); //ищем пользователя по индексу
 
-            if (index === -1) {
-                return res.status(404).json(`User with id ${userId} not found`)
-            }
-            usersDb.splice(index, 1)
+            users.splice(index, 1)
 
-            await fileServices.writer(usersDb);
+            await fileServices.writer(users);
 
             res.sendStatus(204);
         } catch (e) {
