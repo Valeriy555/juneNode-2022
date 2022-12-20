@@ -11,6 +11,6 @@ module.exports = {
     },
 
      writer : async (usersDb) => {
-        await fs.writeFile(pathToFile, JSON.stringify(usersDb)); // с JSON объекта переводим в JSON
+        await fs.writeFile(pathToFile, JSON.stringify(usersDb)); // с объекта переводим в JSON
     },
 }
