@@ -6,11 +6,11 @@ const pathToFile = path.join(process.cwd(), 'dataBase', 'users.json');
 module.exports = {
      reader : async () => {
         const buffer = await fs.readFile(pathToFile);
-        return JSON.parse(buffer.toString());
+        return JSON.parse(buffer.toString());  // с JSON переводим в объект
 
     },
 
      writer : async (usersDb) => {
-        await fs.writeFile(pathToFile, JSON.stringify(usersDb));
+        await fs.writeFile(pathToFile, JSON.stringify(usersDb)); // с JSON объекта переводим в стрингу
     },
 }
