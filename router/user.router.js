@@ -7,22 +7,21 @@ router.get('/', controller.getAllUsers)
 
 router.post('/',
     middleware.isBodyValidCreate,
+    middleware.userNormalizator,
+    middleware.checkIsEmailUnique,
     controller.createUser);
 
 router.get('/:userId',
-    middleware.isIdValid,
     middleware.checkIsUserExist,
     controller.getUserById);
 
 router.put('/:userId',
-    middleware.isIdValid,
     middleware.isBodyValidUpdate,
+    middleware.userNormalizator,
     middleware.checkIsUserExist,
-    controller.updateUserById);
+    controller.updateUser);
 
 router.delete('/:userId',
-    middleware.isIdValid,
-    middleware.checkIsUserExist,
     controller.deleteUserById);
 
 module.exports = router;

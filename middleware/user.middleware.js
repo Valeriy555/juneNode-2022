@@ -1,20 +1,18 @@
-const {fileServices} = require("../services");
+const {userServices} = require("../services");
 const ApiError = require("../error/custom.error");
+const {userNormalizator} = require("../helper");
 module.exports = {
 
     checkIsUserExist: async (req, res, next) => {  // проверяем существует ли пользователь
         try {
             const {userId} = req.params;
 
-            const usersDb = await fileServices.reader();
-
-            const user = usersDb.find((u) => u.id === +userId); //ищем пользователя по id
+            const user = await userServices.findOneByParams({_id: userId});
 
             if (!user) {
                 throw new ApiError(`User with id ${userId} not found`, 404);
             }
 
-            req.users = usersDb;
             req.user = user;
             next();
         } catch (e) {
@@ -22,18 +20,20 @@ module.exports = {
         }
     },
 
-    isBodyValidCreate: async (req, res, next) => {  // проверяем на валидность данные пользователя
+    isBodyValidCreate: (req, res, next) => {  // проверяем на валидность данные пользователя
         try {
-            const {name, age} = req.body;
+            const {name, age, email} = req.body;
 
-            if (!age||age < 0 || Number.isNaN(+age)) {   // валидация age
+            if (!name || name.length < 2 || typeof name !== 'string') { // валидация name
+
+                throw new ApiError(`Wrong name`, 400);
+            }
+            if (!age || age < 0 || Number.isNaN(+age)) {   // валидация age
 
                 throw new ApiError(`Wrong age`, 400);
             }
-
-            if (!name||name.length < 2 || typeof name !== 'string') { // валидация name
-
-                throw new ApiError(`Wrong name`, 400);
+            if (!email || !email.includes('@')) {
+                throw new ApiError('Wrong email', 400);
             }
 
             next();
@@ -42,19 +42,22 @@ module.exports = {
         }
     },
 
-    isBodyValidUpdate: async (req, res, next) => {  // проверяем на валидность данные пользователя
+    isBodyValidUpdate: (req, res, next) => {  // проверяем на валидность данные пользователя
         try {
-            const {name, age} = req.body;
+            const {name, age, email} = req.body;
 
+            if (name && (name.length < 2 || typeof name !== 'string')) { // валидация name
+
+                throw new ApiError(`Wrong name`, 400);
+            }
             if (age && (age < 0 || Number.isNaN(+age))) {   // валидация age
 
                 throw new ApiError(`Wrong age`, 400);
             }
-
-            if (name &&( name.length < 2 || typeof name !== 'string')) { // валидация name
-
-                throw new ApiError(`Wrong name`, 400);
+            if (email && !email.includes('@')) {
+                throw new ApiError('Wrong email', 400);
             }
+
 
             next();
         } catch (e) {
@@ -62,19 +65,35 @@ module.exports = {
         }
     },
 
-    isIdValid: async (req, res, next) => {  // проверяем на валидность ID пользователя
+    userNormalizator: (req, res, next) => {
         try {
-            const {userId} = req.params;
+            const {name, email} = req.body;
 
-            if (userId < 0 || Number.isNaN(+userId)) {   // валидация ID
-                throw new ApiError(`Not valid ID`, 400);
-            }
+            if (name) req.body.name = userNormalizator.name(name);
 
-
+            if (email) req.body.email = email.toLowerCase() // переводит поле email в нижний регистр
             next();
         } catch (e) {
             next(e);
         }
     },
 
+    checkIsEmailUnique: async (req, res, next) => {
+        try {
+            const {email} = req.body;
+
+            if (!email) {
+                throw new ApiError('Email not present', 400);
+            }
+
+            const user = await userServices.findOneByParams({email});
+
+            if (user) {
+                throw new ApiError('User with this email already exists', 409);
+            }
+            next();
+        } catch (e) {
+            next();
+        }
+    },
 }
