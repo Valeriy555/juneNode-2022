@@ -20,6 +20,9 @@
     "twilio": "^3.78.0",
     "uuid": "^8.3.2"
   },
+  "scripts": {
+    "dev": "echo \"Hello Valera\" && nodemon app.js"
+  },
   "devDependencies": {
     "@types/email-templates": "^8.0.4",
     "@types/express-fileupload": "^1.2.2",

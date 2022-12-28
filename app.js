@@ -4,6 +4,7 @@ require('dotenv').config()
 
 
 const {userRouter, carRouter} = require("./router");
+const authRouter = require('./router/auth.router')
 const configs = require('./configs/configs');
 mongoose.set('strictQuery', false);
 
@@ -14,6 +15,7 @@ app.use(express.urlencoded({extended: true}));
 
 app.use('/usersDb', userRouter)
 app.use('/cars', carRouter)
+app.use('/auth', authRouter)
 
 
 app.use((err, req, res, next) => {
