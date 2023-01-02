@@ -1,47 +1,45 @@
-const {userServices} = require("../services");
+const User = require("../dataBase/User");
+const oauthService = require("../service/oauth.service");
 
 module.exports = {
-
     getAllUsers: async (req, res, next) => {
         try {
-            const usersDb = await userServices.findByParams();
+            const users = await User.find({});
 
-            res.json(usersDb)
-        } catch (e) {
-            next(e)
-        }
-    },
-
-    getUserById: async (req, res, next) => { // вызываем юзеров динамично
-        try {
-            const user = await userServices.findByIdWithCars(req.user._id)
-
-            res.json(user)
-        } catch (e) {
-            next(e)
-        }
-    },
-
-    createUser: async (req, res, next) => {
-        try {
-
-            const user = await userServices.create(req.body);
-
-            res.status(201).json(user)
+            res.json(users);
         } catch (e) {
             next(e);
         }
     },
 
-    updateUser: async (req, res, next) => {
+    getUserById: (req, res, next) => {
+        try {
+            res.json(req.user);
+        } catch (e) {
+            next(e)
+        }
+    },
 
+    updateUser: async (req, res, next) => {
         try {
             const newUserInfo = req.body;
             const userId = req.params.userId;
 
-            const user = await userServices.updateOne(userId, newUserInfo);
+            await User.findByIdAndUpdate(userId, newUserInfo);
 
-            res.status(201).json(user);
+            res.json('Updated')
+        } catch (e) {
+            next(e);
+        }
+    },
+
+    createUser: async (req, res, next) => {
+        try {
+            const hashPassword = await oauthService.hashPassword(req.body.password);
+
+            await User.create({ ...req.body, password: hashPassword });
+
+            res.status(201).json('Ok')
         } catch (e) {
             next(e);
         }
@@ -49,10 +47,9 @@ module.exports = {
 
     deleteUserById: async (req, res, next) => {
         try {
+            await User.deleteOne({ _id: req.params.userId });
 
-            await userServices.deleteOne(req.params.userId);
-
-            res.status(204).send('Ok');
+            res.status(204).send('Ok')
         } catch (e) {
             next(e);
         }

@@ -3,9 +3,9 @@ const mongoose = require('mongoose')
 require('dotenv').config()
 
 
-const {userRouter, carRouter} = require("./router");
-const authRouter = require('./router/auth.router')
-const configs = require('./configs/configs');
+const {userRouter, authRouter} = require("./router");
+
+const configs = require('./config/config');
 mongoose.set('strictQuery', false);
 
 const app = express();
@@ -13,9 +13,12 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 
-app.use('/usersDb', userRouter)
-app.use('/cars', carRouter)
-app.use('/auth', authRouter)
+app.use('/auth', authRouter);
+app.use('/users', userRouter);
+
+app.get('/', (req, res) => {
+    res.json('WELCOME')
+});
 
 
 app.use((err, req, res, next) => {
