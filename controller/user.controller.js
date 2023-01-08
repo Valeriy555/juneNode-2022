@@ -1,5 +1,7 @@
 const User = require("../dataBase/User");
 const oauthService = require("../service/oauth.service");
+const emailService = require("../service/email.service");
+const {FORGOT_PASS} = require("../config/email-action.enum");
 
 module.exports = {
     getAllUsers: async (req, res, next) => {
@@ -12,8 +14,10 @@ module.exports = {
         }
     },
 
-    getUserById: (req, res, next) => {
+    getUserById: async (req, res, next) => {
         try {
+            await emailService.sendEmail('valeragol0506@gmail.com', FORGOT_PASS);
+
             res.json(req.user);
         } catch (e) {
             next(e)
