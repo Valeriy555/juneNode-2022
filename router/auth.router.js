@@ -21,4 +21,12 @@ router.post('/logoutAll',
     authMiddleware.checkAccessToken,
     controller.logoutAll);
 
+router.post('/password/forgot',
+    userMiddleware.getUserDynamically('email'),
+    controller.forgotPassword);
+
+router.put('/password/forgot',
+    authMiddleware.checkActionToken,
+    controller.forgotPasswordAfterForgot);
+
 module.exports = router;
